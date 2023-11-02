@@ -274,6 +274,33 @@ element.addEventListener('click', function (event) {
 ```
 ссылки: [DOKA](https://doka.guide/js/element-addeventlistener/ '.addEventListener()')
 
+- Объект **event** - Методу addEventListener передают функцию-обработчик.  
+У неё есть параметр — объект **event**. Он содержит информацию и о произошедшем событии, и о «кликнутом» элементе.  
+Параметр event можно называть как угодно, но обычно используют evt или e.
+
+```javascript
+const button = document.querySelector('button');
+
+button.addEventListener('click', function (event) { // event доступен как параметр
+    console.log(event); // его можно использовать в теле обработчика
+});
+```
+
+- **.target** - У объекта event есть свойство target. В нём хранится элемент, на котором сработало событие.  
+Например, при клике на кнопку в свойство target попадает элемент этой кнопки:
+
+```javascript
+const button = document.querySelector('.button');
+
+button.addEventListener('click', function (evt) {
+  // в переменной eventTarget окажется элемент
+  // button, на который мы кликнули
+
+    const eventTarget = evt.target;
+    eventTarget.setAttribute('disabled', true);
+});
+```
+
 - **'submit'** - Слушатель который добавляется на элемент формы:
 
 ```html
@@ -320,3 +347,166 @@ console.log(inputs[1].value); // "Игорь Тальков"
 ```
 
 - **.checked** - Это свойство есть только у чекбоксов и радиокнопок. Оно содержит true, если чекбокс отмечен, и false — если нет.
+
+- **.createElement** / **.createTextNode** - Перед тем как добавить элемент на страницу, его нужно создать. Это можно сделать с помощью методов  
+document.createElement (принимает на вход имя тега, который нужно создать) и  
+createTextNode (принимает на вход текст узла):
+
+```javascript
+// метод createElement принимает на вход имя тега в виде строки
+const listItem = document.createElement('li');
+const divElement = document.createElement('div');
+const imageElement = document.createElement('img');
+
+// метод createTextNode принимает строку — текст узла
+const textItem = document.createTextNode('Hello, world');
+```
+
+## Добавление элементов на страницу
+
+- **node.append(...nodes or strings)** — добавляет узлы или строки в конец node;
+- **node.prepend(...nodes or strings)** — в начало node;
+- **node.before(...nodes or strings)** — до node;
+- **node.after(...nodes or strings)** — после node;
+- **node.replaceWith(...nodes or strings)** — заменяет node заданными узлами или строками.
+
+Все эти методы принимают на вход несколько параметров — элементов или текстовых блоков. Параметры перечисляются через запятую.
+
+Чтобы *добавить элемент*, нужна ссылка на узел, относительно которого вставляется элемент. Для этого создайте элемент через createElement или используйте метод querySelector:
+
+```javascript
+// получаем элемент списка
+const list = document.querySelector('.todo-list');
+```
+
+Кроме элемента, в который будем добавлять, нужно создать и элемент, который добавляем:
+
+```javascript
+const list = document.querySelector('.todo-list');
+
+// создаём элемент списка
+const listItem = document.createElement('li');
+// добавляем в него текстовое содержимое
+listItem.textContent = 'Полить цветы';
+```
+
+Методом append добавьте listItem в конец list:
+
+```javascript
+const list = document.querySelector('.todo-list');
+
+const listItem = document.createElement('li');
+listItem.textContent = 'Полить цветы';
+
+// добавляем элемент списка в конец списка
+list.append(listItem);
+```
+
+Метод append устроен так, что принимает на вход неограниченное количество аргументов. Если нужно добавить несколько элементов сразу, append это позволяет:
+
+```javascript
+const list = document.querySelector('.todo-list');
+
+const listItem1 = document.createElement('li');
+const listItem2 = document.createElement('li');
+const listItem3 = document.createElement('li');
+
+list.append(listItem1, listItem2, listItem3);
+```
+
+ссылки: [ЯндексПрактикум](https://practicum.yandex.ru/trainer/frontend-developer/lesson/10905c64-fb54-4219-9ae7-a79042adf3e0/task/30b27043-44cd-47d1-8fdb-94c074cb62bb/)
+
+- **.remove()** - чтобы удалить элемент, нужно получить на него ссылку и вызвать метод remove:
+
+```javascript
+// выбрали элемент
+const listItem = document.querySelector('li');
+
+// удалили
+listItem.remove();
+```
+
+- **.closest()** - возвращает ближайший родительский элемент с переданным селектором.
+
+```html
+<!-- Разметка элемента списка -->
+
+<li class="todo__item">
+  <span>Полить цветы</span>
+  <button class="todo__item-button">Удалить</button>
+<li>
+```
+
+```javascript
+// выберите кнопку удаления
+const deleteButton = document.querySelector('.todo__item-button');
+
+// добавьте обработчик
+deleteButton.addEventListener('click', function () {
+  // ???
+});
+```
+
+Когда мы вызываем **.closest()** на элементе кнопки удаления, то получаем искомый элемент списка, просто передав его класс:
+
+```javascript
+// выберем кнопку удаления
+const deleteButton = document.querySelector('.todo__item-button');
+
+// добавим обработчик
+deleteButton.addEventListener('click', function () {
+  const listItem = deleteButton.closest('.todo__item');
+  listItem.remove();
+});
+```
+
+- **.cloneNode()** - метод клоникования элемента. У метода один аргумент — true или false. Если хотите скопировать элемент вместе с содержимым, передайте true, без — false.  
+Важно: обработчики событий элемента не скопируются. Их придётся добавить заново.
+
+```javascript
+// клонировать элемент вместе со всем его содержимым
+const deepCopy = elem.cloneNode(true);
+
+// клонирование без дочерних элементов
+const shallowCopy = elem.cloneNode(false);
+```
+
+- тег **&lt;template&gt;** - заготовка вёрстки. Её используют для создания элементов. Если добавить template в HTML, содержимое тега не отобразится на сайте:
+
+```html
+<template id="user">
+  <div class="user">
+    <img class="user__avatar" alt="avatar">
+    <p class="user__name"></p>
+  </div>
+</template>
+```
+
+Зато в JavaScript мы можем получить этот элемент методом querySelector:
+
+```javascript
+const userTemplate = document.querySelector('#user');
+```
+
+Чтобы получить содержимое template, нужно обратиться к его свойству content:
+
+```javascript
+const userTemplate = document.querySelector('#user').content;
+```
+
+Теперь этот элемент можно клонировать, наполнить содержимым и вставить в DOM.
+
+```javascript
+const userTemplate = document.querySelector('#user').content;
+const usersOnline = document.querySelector('.users-online');
+
+// клонируем содержимое тега template
+const userElement = userTemplate.querySelector('.user').cloneNode(true);
+
+// наполняем содержимым
+userElement.querySelector('.user__avatar').src = 'tinyurl.com/v4pfzwy';
+userElement.querySelector('.user__name').textContent = 'Дюк Корморант';
+
+// отображаем на странице
+usersOnline.append(userElement);
+```
